@@ -43,7 +43,7 @@ export default function PlayerCard({
   const getNumberStyle = (number: number) => {
     // Verificar se o número aparece em algum dos jogos
     const isMatched = games.some(game => game.numbers.includes(number));
-    return `w-12 h-12 rounded-lg flex items-center justify-center text-sm font-bold transition-all duration-300 ${
+    return `w-full aspect-square rounded-lg flex items-center justify-center text-xs sm:text-sm md:text-base lg:text-lg font-bold transition-all duration-300 ${
       isMatched
         ? "bg-gradient-to-br from-red-100 to-red-200 text-red-700 shadow-md scale-110"
         : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -78,21 +78,21 @@ export default function PlayerCard({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
     >
-      <Card className={`p-6 hover:shadow-xl transition-all duration-300 ${matchedNumbers.length === 6 ? 'border-3 border-yellow-500' : 'bg-gradient-to-br from-white to-gray-50'}`}>
-        <div className="flex flex-col gap-4">
+      <Card className={`p-3 sm:p-4 md:p-6 hover:shadow-xl transition-all duration-300 ${matchedNumbers.length === 6 ? 'border-3 border-yellow-500' : 'bg-gradient-to-br from-white to-gray-50'}`}>
+        <div className="flex flex-col gap-3 sm:gap-4">
           {/* Avatar */}
-          <div className="flex items-center gap-4">
-            <div className={`w-16 h-16 rounded-xl ${avatarInfo.color} flex items-center justify-center flex-shrink-0`}>
-              <Icon className="w-8 h-8" />
+          <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
+            <div className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl ${avatarInfo.color} flex items-center justify-center flex-shrink-0`}>
+              <Icon className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8" />
             </div>
-            <div className="flex flex-col">
-              <h3 className="text-xl font-bold text-gray-900 truncate">{player.name}</h3>
-              <h5 className="text-sm text-gray-500 mb-3 truncate">{matchedNumbers.length === 6 ? 'Vencedor!' : ''}</h5>
+            <div className="flex flex-col flex-1 min-w-0">
+              <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 truncate">{player.name}</h3>
+              <h5 className="text-xs sm:text-sm text-gray-500 mb-2 sm:mb-3 truncate">{matchedNumbers.length === 6 ? 'Vencedor!' : ''}</h5>
             </div>
             <AlertDialog>
                   <AlertDialogTrigger asChild>
-                  <div className="flex gap-4 ml-auto self-start bg-red-200 rounded-md p-2 hover:bg-red-500 transition-all duration-300 cursor-pointer">
-                      <Trash className="w-4 h-4 text-white" />
+                  <div className="flex ml-auto bg-red-200 rounded-md p-1.5 sm:p-2 hover:bg-red-500 transition-all duration-300 cursor-pointer">
+                      <Trash className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
                   </div>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
@@ -112,7 +112,7 @@ export default function PlayerCard({
 
           {/* Content */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-4">
+            <div className="grid grid-cols-6 gap-2 sm:gap-3 md:gap-4 lg:gap-5">
               {player.numbers.map((number: number, index: number) => (
                 <motion.div
                   key={index}
@@ -128,11 +128,11 @@ export default function PlayerCard({
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="mt-3 px-3 py-1.5 bg-red-50 rounded-lg inline-block"
+                className="mt-4 sm:mt-3 md:mt-4 lg:mt-5 px-2 sm:px-3 py-1 sm:py-1.5 bg-red-50 rounded-lg inline-block"
               >
-                <div className="flex items-center gap-2">
-                  {matchedNumbers.length === 6 && <Crown className={`w-5 h-5 text-yellow-600`} />}
-                  <span className={`text-sm font-semibold ${matchedNumbers.length === 6 ? 'text-green-600' : 'text-red-700'}`}>
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  {matchedNumbers.length === 6 && <Crown className={`w-4 h-4 sm:w-5 sm:h-5 text-yellow-600`} />}
+                  <span className={`text-xs sm:text-sm font-semibold ${matchedNumbers.length === 6 ? 'text-green-600' : 'text-red-700'}`}>
                     {matchedNumbers.length} {matchedNumbers.length === 1 ? "Combinação" : "Combinações"}
                   </span>
                 </div>
