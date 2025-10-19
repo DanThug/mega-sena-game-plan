@@ -1,8 +1,7 @@
 import React from "react";
 import { Card } from "@/components/ui/card";
-import { Crown, Info, Trash, User, UserCircle, UserCircle2, Users, X } from "lucide-react";
+import { Crown, Trash, User, UserCircle, UserCircle2, Users } from "lucide-react";
 import { motion } from "framer-motion";
-import { Button } from "../ui/button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,7 +42,7 @@ export default function PlayerCard({
   const getNumberStyle = (number: number) => {
     // Verificar se o número aparece em algum dos jogos
     const isMatched = games.some(game => game.numbers.includes(number));
-    return `w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg flex items-center justify-center text-xs sm:text-sm font-bold transition-all duration-300 ${
+    return `w-full aspect-square rounded-lg flex items-center justify-center text-xs sm:text-sm md:text-base lg:text-lg font-bold transition-all duration-300 ${
       isMatched
         ? "bg-gradient-to-br from-red-100 to-red-200 text-red-700 shadow-md scale-110"
         : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -112,7 +111,7 @@ export default function PlayerCard({
 
           {/* Content */}
           <div className="flex-1 min-w-0">
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 md:gap-4">
+            <div className="grid grid-cols-6 gap-2 sm:gap-3 md:gap-4 lg:gap-5">
               {player.numbers.map((number: number, index: number) => (
                 <motion.div
                   key={index}
@@ -128,7 +127,7 @@ export default function PlayerCard({
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="mt-2 sm:mt-3 px-2 sm:px-3 py-1 sm:py-1.5 bg-red-50 rounded-lg inline-block"
+                className="mt-4 sm:mt-3 md:mt-4 lg:mt-5 px-2 sm:px-3 py-1 sm:py-1.5 bg-red-50 rounded-lg inline-block"
               >
                 <div className="flex items-center gap-1.5 sm:gap-2">
                   {matchedNumbers.length === 6 && <Crown className={`w-4 h-4 sm:w-5 sm:h-5 text-yellow-600`} />}
