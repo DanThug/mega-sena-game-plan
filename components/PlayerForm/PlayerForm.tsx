@@ -141,7 +141,7 @@ export default function PlayerForm({ onAddPlayer }: { onAddPlayer: (player: any)
               setErrors({ ...errors, name: undefined });
             }}
             placeholder="Digite o nome do jogador"
-            className={`h-12 text-lg ${errors.name ? "border-red-400" : ""}`}
+            className={`h-12 text-lg placeholder:text-sm ${errors.name ? "border-red-400" : ""}`}
           />
           {errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
         </div>
@@ -153,13 +153,14 @@ export default function PlayerForm({ onAddPlayer }: { onAddPlayer: (player: any)
             {numbers.map((num, index) => (
               <div key={index} className="space-y-1">
                 <Input
+                  id={`number${index}`}
                   type="text"
                   inputMode="numeric"
                   value={num}
                   onChange={(e) => handleNumberChange(index, e.target.value)}
                   placeholder={`Número ${index + 1}`}
                   maxLength={2}
-                  className={`h-14 text-center text-xl font-bold ${
+                  className={`h-14 text-center text-xl placeholder:text-sm font-bold ${
                     errors[`number${index}`] ? "border-red-400" : ""
                   }`}
                 />
@@ -175,7 +176,7 @@ export default function PlayerForm({ onAddPlayer }: { onAddPlayer: (player: any)
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-3 pt-4">
+        <div className="flex flex-wrap gap-3 pt-4">
           <Button
             onClick={handleReset}
             variant="outline"

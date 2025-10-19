@@ -38,6 +38,7 @@ export default function MegaSenaPage() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
   const [drawnGames, setDrawnGames] = useState<DrawNumbers[]>([]);
+  const [activeTab, setActiveTab] = useState("register");
 
   useEffect(() => {
     loadPlayers();
@@ -96,6 +97,9 @@ export default function MegaSenaPage() {
       
       // Recarregar lista
       await loadPlayers();
+      
+      // Mudar para a aba de jogadores
+      setActiveTab("players");
     } catch (error) {
       console.error('Erro ao adicionar jogador:', error);
     }
@@ -173,21 +177,21 @@ export default function MegaSenaPage() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Tabs defaultValue="register" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full max-w-xl mx-auto grid-cols-2 h-14 bg-white shadow-lg rounded-xl">
             <TabsTrigger
               value="register"
-              className="text-base font-semibold data-[state=active]:bg-blue-600 data-[state=active]:text-white rounded-lg cursor-pointer"
+              className="text-xs sm:text-sm md:text-base font-semibold data-[state=active]:bg-blue-600 data-[state=active]:text-white rounded-lg cursor-pointer"
             >
               <UserPlus className="w-4 h-4 mr-2" />
-              Novo Jogador
+              <span className="hidden sm:inline">Novo Jogador</span>
             </TabsTrigger>
             <TabsTrigger
               value="players"
-              className="text-base font-semibold data-[state=active]:bg-blue-600 data-[state=active]:text-white rounded-lg cursor-pointer"
+              className="text-xs sm:text-sm md:text-base font-semibold data-[state=active]:bg-blue-600 data-[state=active]:text-white rounded-lg cursor-pointer"
             >
               <Users className="w-4 h-4 mr-2" />
-              Jogadores & Partidas
+              <span className="hidden sm:inline">Jogadores & Partidas</span>
             </TabsTrigger>
           </TabsList>
 

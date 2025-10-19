@@ -212,7 +212,7 @@ export default function NumberMatchForm({ onMatch, currentDrawn }: { onMatch: (m
               setErrors({ ...errors, gameId: undefined });
             }}
             placeholder="Digite o número do jogo"
-            className={`h-12 text-lg bg-white/10 border-white/20 text-white placeholder:text-blue-200 ${
+            className={`h-12 text-lg bg-white/10 border-white/20 placeholder:text-sm text-white placeholder:text-blue-200 ${
               errors.gameId ? "border-red-400" : ""
             }`}
           />
@@ -232,7 +232,7 @@ export default function NumberMatchForm({ onMatch, currentDrawn }: { onMatch: (m
                   onChange={(e) => handleNumberChange(index, e.target.value)}
                   placeholder={`Número ${index + 1}`}
                   maxLength={2}
-                  className={`h-14 text-center text-xl font-bold bg-white/10 border-white/20 text-white placeholder:text-blue-200 ${
+                  className={`h-14 text-center text-xl placeholder:text-sm font-bold bg-white/10 border-white/20 text-white placeholder:text-blue-200 ${
                     errors[`number${index}`] ? "border-red-400" : ""
                   }`}
                 />
@@ -248,7 +248,7 @@ export default function NumberMatchForm({ onMatch, currentDrawn }: { onMatch: (m
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-3 pt-4">
+        <div className="flex flex-wrap gap-3 pt-4">
           <Button
             onClick={handleReset}
             variant="outline"
