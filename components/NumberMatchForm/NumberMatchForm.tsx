@@ -223,7 +223,7 @@ export default function NumberMatchForm({ onMatch, currentDrawn }: { onMatch: (m
       
       // Seção de Jogadores
       csvContent += "JOGADORES CADASTRADOS\n";
-      csvContent += "Nome,Número 1,Número 2,Número 3,Número 4,Número 5,Número 6,Combinações\n";
+      csvContent += "Nome,Número 1,Número 2,Número 3,Número 4,Número 5,Número 6,Número 7,Número 8,Número 9,Número 10,Número 11,Número 12,Número 13,Número 14,Número 15,Número 16,Número 17,Número 18,Número 19,Número 20,Combinações\n";
       playersWithMatches.forEach((player: any) => {
         csvContent += `${player.name},${player.numbers.join(",")},${player.matches}\n`;
       });
