@@ -132,17 +132,23 @@ export default function NumberMatchForm({ onMatch, currentDrawn }: { onMatch: (m
       
       // Calcular combinações para cada jogador
       const playersWithMatches = currentPlayers.map((player: any) => {
+        const playerNumberSets = player.numberSets || [player.numbers];
         const allMatchedNumbers = new Set<number>();
+        
         currentGames.forEach((game: any) => {
-          player.numbers.forEach((num: number) => {
-            if (game.numbers.includes(num)) {
-              allMatchedNumbers.add(num);
-            }
+          playerNumberSets.forEach((numberSet: number[]) => {
+            numberSet.forEach((num: number) => {
+              if (game.numbers.includes(num)) {
+                allMatchedNumbers.add(num);
+              }
+            });
           });
         });
+        
         return {
           name: player.name,
-          numbers: player.numbers,
+          numberSets: playerNumberSets,
+          totalSets: playerNumberSets.length,
           matches: allMatchedNumbers.size
         };
       });
@@ -163,9 +169,11 @@ export default function NumberMatchForm({ onMatch, currentDrawn }: { onMatch: (m
       
       // Seção de Jogadores
       csvContent += "JOGADORES CADASTRADOS\n";
-      csvContent += "Nome,Número 1,Número 2,Número 3,Número 4,Número 5,Número 6,Combinações\n";
+      csvContent += "Nome,Conjunto,Número 1,Número 2,Número 3,Número 4,Número 5,Número 6,Total Conjuntos,Combinações\n";
       playersWithMatches.forEach((player: any) => {
-        csvContent += `${player.name},${player.numbers.join(",")},${player.matches}\n`;
+        player.numberSets.forEach((numberSet: number[], index: number) => {
+          csvContent += `${player.name},${index + 1},${numberSet.join(",")},${player.totalSets},${player.matches}\n`;
+        });
       });
       
       // Download do arquivo

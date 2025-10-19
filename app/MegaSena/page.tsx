@@ -250,7 +250,7 @@ export default function MegaSenaPage() {
                               </p>
                             )}
                           </div>
-                          <div className="flex ml-auto pr-6 gap-2">
+                          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 ml-auto pr-6">
                             {game.numbers.map((num, index) => (
                               <div
                                 key={index}

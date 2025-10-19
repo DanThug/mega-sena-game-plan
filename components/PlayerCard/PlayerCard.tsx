@@ -1,8 +1,7 @@
 import React from "react";
 import { Card } from "@/components/ui/card";
-import { Crown, Info, Trash, User, UserCircle, UserCircle2, Users, X } from "lucide-react";
+import { Crown, Trash, User, UserCircle, UserCircle2, Users } from "lucide-react";
 import { motion } from "framer-motion";
-import { Button } from "../ui/button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -55,11 +54,15 @@ export default function PlayerCard({
     if (games.length === 0) return [];
     
     const allMatchedNumbers = new Set<number>();
+    const playerNumberSets = player.numberSets || [player.numbers];
+    
     games.forEach(game => {
-      player.numbers.forEach((num: number) => {
-        if (game.numbers.includes(num)) {
-          allMatchedNumbers.add(num);
-        }
+      playerNumberSets.forEach((numberSet: number[]) => {
+        numberSet.forEach((num: number) => {
+          if (game.numbers.includes(num)) {
+            allMatchedNumbers.add(num);
+          }
+        });
       });
     });
     
@@ -67,6 +70,7 @@ export default function PlayerCard({
   };
 
   const matchedNumbers = getMatchedNumbers();
+  const playerNumberSets = player.numberSets || [player.numbers];
 
   const handleDeletePlayer = (id: string) => {
     onDelete(id);
@@ -78,7 +82,7 @@ export default function PlayerCard({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
     >
-      <Card className={`p-3 sm:p-4 md:p-6 hover:shadow-xl transition-all duration-300 ${matchedNumbers.length === 6 ? 'border-3 border-yellow-500' : 'bg-gradient-to-br from-white to-gray-50'}`}>
+      <Card className={`p-3 sm:p-4 md:p-6 hover:shadow-xl transition-all duration-300 ${matchedNumbers.length === 15 ? 'border-3 border-yellow-500' : 'bg-gradient-to-br from-white to-gray-50'}`}>
         <div className="flex flex-col gap-3 sm:gap-4">
           {/* Avatar */}
           <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
@@ -87,7 +91,7 @@ export default function PlayerCard({
             </div>
             <div className="flex flex-col flex-1 min-w-0">
               <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 truncate">{player.name}</h3>
-              <h5 className="text-xs sm:text-sm text-gray-500 mb-2 sm:mb-3 truncate">{matchedNumbers.length === 6 ? 'Vencedor!' : ''}</h5>
+              <h5 className="text-xs sm:text-sm text-gray-500 mb-2 sm:mb-3 truncate">{matchedNumbers.length === 15 ? 'Vencedor!' : ''}</h5>
             </div>
             <AlertDialog>
                   <AlertDialogTrigger asChild>
@@ -111,28 +115,42 @@ export default function PlayerCard({
           </div>
 
           {/* Content */}
-          <div className="flex-1 min-w-0">
-            <div className="grid grid-cols-6 gap-2 sm:gap-3 md:gap-4 lg:gap-5">
-              {player.numbers.map((number: number, index: number) => (
-                <motion.div
-                  key={index}
-                  className={getNumberStyle(number)}
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ type: "spring", stiffness: 400 }}
-                >
-                  {number}
-                </motion.div>
+          <div className="flex-1 min-w-0 space-y-3">
+            <div className="text-xs sm:text-sm text-gray-500 font-semibold">
+              {playerNumberSets.length} {playerNumberSets.length === 1 ? "Conjunto" : "Conjuntos"}
+            </div>
+            
+            <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+              {playerNumberSets.map((numberSet: number[], setIndex: number) => (
+                <div key={setIndex} className="border border-gray-200 rounded-lg p-2 bg-gray-50">
+                  <div className="text-xs text-gray-500 mb-1.5 font-medium">
+                    Conjunto {setIndex + 1}
+                  </div>
+                  <div className="grid grid-cols-6 gap-1 sm:gap-2">
+                    {numberSet.map((number: number, numIndex: number) => (
+                      <motion.div
+                        key={numIndex}
+                        className={getNumberStyle(number)}
+                        whileHover={{ scale: 1.05 }}
+                        transition={{ type: "spring", stiffness: 400 }}
+                      >
+                        {number}
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
+
             {matchedNumbers.length > 0 && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="mt-4 sm:mt-3 md:mt-4 lg:mt-5 px-2 sm:px-3 py-1 sm:py-1.5 bg-red-50 rounded-lg inline-block"
+                className="px-2 sm:px-3 py-1 sm:py-1.5 bg-red-50 rounded-lg inline-block"
               >
                 <div className="flex items-center gap-1.5 sm:gap-2">
-                  {matchedNumbers.length === 6 && <Crown className={`w-4 h-4 sm:w-5 sm:h-5 text-yellow-600`} />}
-                  <span className={`text-xs sm:text-sm font-semibold ${matchedNumbers.length === 6 ? 'text-green-600' : 'text-red-700'}`}>
+                  {matchedNumbers.length === 15 && <Crown className={`w-4 h-4 sm:w-5 sm:h-5 text-yellow-600`} />}
+                  <span className={`text-xs sm:text-sm font-semibold ${matchedNumbers.length === 15 ? 'text-green-600' : 'text-red-700'}`}>
                     {matchedNumbers.length} {matchedNumbers.length === 1 ? "Combinação" : "Combinações"}
                   </span>
                 </div>
