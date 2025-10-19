@@ -99,12 +99,12 @@ export default function PlayerCard({
                       <AlertDialogHeader>
                           <AlertDialogTitle>Está ação não pode ser desfeita!</AlertDialogTitle>
                           <AlertDialogDescription>
-                              Tem certeza que deseja remover o jogador {player.name} dos jogadores cadastrados? Essa ação não pode ser desfeita.
+                              Tem certeza que deseja remover o jogador <span className="font-bold text-blue-600">{player.name}</span> dos jogadores cadastrados?
                           </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => handleDeletePlayer(player.id)}>Continue</AlertDialogAction>
+                          <AlertDialogCancel className="cursor-pointer">Cancelar</AlertDialogCancel>
+                          <AlertDialogAction className="bg-red-500 hover:bg-red-600 cursor-pointer" onClick={() => handleDeletePlayer(player.id)}>Continuar</AlertDialogAction>
                       </AlertDialogFooter>
                   </AlertDialogContent>
               </AlertDialog>

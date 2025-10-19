@@ -266,12 +266,12 @@ export default function MegaSenaPage() {
                                     <AlertDialogHeader>
                                         <AlertDialogTitle>Está ação não pode ser desfeita!</AlertDialogTitle>
                                         <AlertDialogDescription>
-                                            Tem certeza que deseja remover o jogo {game.gameId} dos jogos cadastrados? Essa ação não pode ser desfeita.
+                                            Tem certeza que deseja remover o jogo <span className="font-bold text-blue-600">{game.gameId}</span> dos jogos cadastrados?
                                         </AlertDialogDescription>
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                        <AlertDialogAction onClick={() => handleDeleteCurrentGame(game.gameId)}>Continue</AlertDialogAction>
+                                        <AlertDialogCancel className="cursor-pointer">Cancelar</AlertDialogCancel>
+                                        <AlertDialogAction className="bg-red-500 hover:bg-red-600 cursor-pointer" onClick={() => handleDeleteCurrentGame(game.gameId)}>Continuar</AlertDialogAction>
                                     </AlertDialogFooter>
                                 </AlertDialogContent>
                             </AlertDialog>

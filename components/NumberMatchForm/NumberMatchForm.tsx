@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Trophy, RotateCcw } from "lucide-react";
+import { toast } from "sonner"
+import { Trophy, RotateCcw, FileDown } from "lucide-react";
 
 interface FormErrors {
   [key: string]: string | null | undefined;
@@ -64,7 +65,9 @@ export default function NumberMatchForm({ onMatch, currentDrawn }: { onMatch: (m
       const gameExists = currentGames.some((game: any) => game.gameId === newGame.gameId);
       
       if (gameExists) {
-        alert(`Já existe um jogo com o número ${newGame.gameId}!`);
+        toast.warning("Jogo duplicado!", {
+          description: `Já existe um jogo com o número ${newGame.gameId}.`,
+        });
         return false;
       }
       
@@ -73,9 +76,18 @@ export default function NumberMatchForm({ onMatch, currentDrawn }: { onMatch: (m
       
       // Salvar no localStorage
       localStorage.setItem('megaSenaCurrentGame', JSON.stringify(updatedGames));
+      
+      // Mostrar toast de sucesso
+      toast.success("Jogo cadastrado!", {
+        description: `Jogo ${newGame.gameId} foi adicionado com sucesso.`,
+      });
+      
       return true;
     } catch (error) {
       console.error('Erro ao salvar jogo:', error);
+      toast.error("Erro ao cadastrar jogo", {
+        description: "Não foi possível salvar o jogo. Tente novamente.",
+      });
       return false;
     }
   };
@@ -106,6 +118,75 @@ export default function NumberMatchForm({ onMatch, currentDrawn }: { onMatch: (m
     setGameId("");
     setDrawnNumbers(Array(6).fill(""));
     setErrors({});
+  };
+
+  const handleExportGames = () => {
+    try {
+      // Obter jogos do localStorage
+      const storedGames = localStorage.getItem('megaSenaCurrentGame');
+      const currentGames = storedGames ? JSON.parse(storedGames) : [];
+      
+      // Obter jogadores do localStorage
+      const storedPlayers = localStorage.getItem('megaSenaPlayers');
+      const currentPlayers = storedPlayers ? JSON.parse(storedPlayers) : [];
+      
+      // Calcular combinações para cada jogador
+      const playersWithMatches = currentPlayers.map((player: any) => {
+        const allMatchedNumbers = new Set<number>();
+        currentGames.forEach((game: any) => {
+          player.numbers.forEach((num: number) => {
+            if (game.numbers.includes(num)) {
+              allMatchedNumbers.add(num);
+            }
+          });
+        });
+        return {
+          name: player.name,
+          numbers: player.numbers,
+          matches: allMatchedNumbers.size
+        };
+      });
+      
+      // Criar conteúdo CSV
+      let csvContent = "data:text/csv;charset=utf-8,";
+      
+      // Seção de Jogos
+      csvContent += "JOGOS CADASTRADOS\n";
+      csvContent += "Número do Jogo,Número 1,Número 2,Número 3,Número 4,Número 5,Número 6,Data\n";
+      currentGames.forEach((game: any) => {
+        const date = game.date ? new Date(game.date).toLocaleString('pt-BR') : 'N/A';
+        csvContent += `${game.gameId},${game.numbers.join(",")},${date}\n`;
+      });
+      
+      // Espaço entre seções
+      csvContent += "\n";
+      
+      // Seção de Jogadores
+      csvContent += "JOGADORES CADASTRADOS\n";
+      csvContent += "Nome,Número 1,Número 2,Número 3,Número 4,Número 5,Número 6,Combinações\n";
+      playersWithMatches.forEach((player: any) => {
+        csvContent += `${player.name},${player.numbers.join(",")},${player.matches}\n`;
+      });
+      
+      // Download do arquivo
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `mega-sena-export-${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Mostrar toast de sucesso
+      toast.success("Exportação concluída!", {
+        description: `Arquivo exportado com ${currentGames.length} jogo(s) e ${currentPlayers.length} jogador(es).`,
+      });
+    } catch (error) {
+      console.error('Erro ao exportar:', error);
+      toast.error("Erro na exportação", {
+        description: "Não foi possível exportar os dados. Verifique o console para mais detalhes.",
+      });
+    }
   };
 
   return (
@@ -178,10 +259,20 @@ export default function NumberMatchForm({ onMatch, currentDrawn }: { onMatch: (m
           </Button>
           <Button
             onClick={handleMatch}
-            className="flex-1 h-12 text-base font-semibold bg-white text-blue-600 hover:bg-blue-50 cursor-pointer"
+            className="flex-1 h-12 text-base font-semibold bg-white text-blue-600 hover:bg-teal-500 hover:text-white cursor-pointer"
           >
             <Trophy className="w-4 h-4 mr-2" />
-            Encontrar números
+            Cadastrar números
+          </Button>
+        </div>
+        <div className="flex justify-center">
+          <Button
+            onClick={handleExportGames}
+            variant="outline"
+            className="flex-1 h-12 text-base font-semibold bg-purple-400 border-purple-500 text-white hover:bg-purple-500 hover:text-white cursor-pointer"
+          >
+            <FileDown className="w-4 h-4 mr-2" />
+            Exportar jogos
           </Button>
         </div>
       </CardContent>

@@ -120,3 +120,12 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Sonner Toast Customization */
+[data-sonner-toast] [data-description] {
+  color: rgb(55 65 81) !important; /* gray-700 */
+}
+
+.dark [data-sonner-toast] [data-description] {
+  color: rgb(209 213 219) !important; /* gray-300 */
+}
