@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { User, UserCircle, UserCircle2, Users, Plus, Trash2 } from "lucide-react";
+import { User, UserCircle, UserCircle2, Users } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import Toast from "../Toast/Toast";
 
@@ -23,33 +23,18 @@ interface FormErrors {
 export default function PlayerForm({ onAddPlayer }: { onAddPlayer: (player: any) => void }) {
   const [name, setName] = useState("");
   const [selectedAvatar, setSelectedAvatar] = useState(avatarOptions[0].id);
-  const [numberSets, setNumberSets] = useState<string[][]>([Array(6).fill("")]);
+  const [numbers, setNumbers] = useState(Array(20).fill(""));
   const [errors, setErrors] = useState<FormErrors>({});
   const [toastMessage, setToastMessage] = useState<string>('');
   const [showToast, setShowToast] = useState(false);
 
-  const handleNumberChange = (setIndex: number, numIndex: number, value: string) => {
+  const handleNumberChange = (index: number, value: string) => {
     const num = value.replace(/\D/g, "");
     if (num === "" || (parseInt(num) >= 1 && parseInt(num) <= 60)) {
-      const newNumberSets = [...numberSets];
-      newNumberSets[setIndex][numIndex] = num;
-      setNumberSets(newNumberSets);
-      setErrors({ ...errors, [`set${setIndex}_number${numIndex}`]: null });
-    }
-  };
-
-  const addNumberSet = () => {
-    if (numberSets.length < 20) {
-      setNumberSets([...numberSets, Array(6).fill("")]);
-    } else {
-      handleShowToastMessage("Máximo de 20 conjuntos atingido");
-    }
-  };
-
-  const removeNumberSet = (index: number) => {
-    if (numberSets.length > 1) {
-      const newNumberSets = numberSets.filter((_, i) => i !== index);
-      setNumberSets(newNumberSets);
+      const newNumbers = [...numbers];
+      newNumbers[index] = num;
+      setNumbers(newNumbers);
+      setErrors({ ...errors, [`number${index}`]: null });
     }
   };
 
@@ -60,24 +45,22 @@ export default function PlayerForm({ onAddPlayer }: { onAddPlayer: (player: any)
       newErrors.name = "Nome é obrigatório";
     }
     
-    numberSets.forEach((numbers, setIndex) => {
-      numbers.forEach((num, numIndex) => {
-        if (!num) {
-          newErrors[`set${setIndex}_number${numIndex}`] = "Obrigatório";
-        } else {
-          const numInt = parseInt(num);
-          if (numInt < 1 || numInt > 60) {
-            newErrors[`set${setIndex}_number${numIndex}`] = "Deve ser entre 1 e 60";
-          }
+    numbers.forEach((num, index) => {
+      if (!num) {
+        newErrors[`number${index}`] = "Obrigatório";
+      } else {
+        const numInt = parseInt(num);
+        if (numInt < 1 || numInt > 60) {
+          newErrors[`number${index}`] = "Deve ser entre 1 e 60";
         }
-      });
-
-      const filledNumbers = numbers.filter(n => n).map(n => parseInt(n));
-      const uniqueNumbers = new Set(filledNumbers);
-      if (filledNumbers.length === 6 && uniqueNumbers.size !== 6) {
-        newErrors[`set${setIndex}_duplicate`] = "Os números devem ser únicos";
       }
     });
+
+    const filledNumbers = numbers.filter(n => n).map(n => parseInt(n));
+    const uniqueNumbers = new Set(filledNumbers);
+    if (filledNumbers.length !== uniqueNumbers.size) {
+      newErrors.duplicate = "Os números devem ser únicos (não pode haver números repetidos)";
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -89,7 +72,7 @@ export default function PlayerForm({ onAddPlayer }: { onAddPlayer: (player: any)
       onAddPlayer({
         name: name.trim(),
         avatar: selectedAvatar,
-        numberSets: numberSets.map(set => set.map(n => parseInt(n)))
+        numbers: numbers.map(n => parseInt(n))
       });
       handleReset();
     } else {
@@ -99,7 +82,7 @@ export default function PlayerForm({ onAddPlayer }: { onAddPlayer: (player: any)
 
   const handleReset = () => {
     setName("");
-    setNumberSets([Array(6).fill("")]);
+    setNumbers(Array(20).fill(""));
     setErrors({});
   };
 
@@ -163,83 +146,33 @@ export default function PlayerForm({ onAddPlayer }: { onAddPlayer: (player: any)
           {errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
         </div>
 
-        {/* Number Sets */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <Label className="text-sm font-semibold text-gray-700">
-              Conjuntos de números (1-60) - {numberSets.length}/20
-            </Label>
-            {numberSets.length < 20 && (
-              <Button
-                type="button"
-                onClick={addNumberSet}
-                size="sm"
-                variant="outline"
-                className="h-8 gap-1 cursor-pointer"
-              >
-                <Plus className="w-4 h-4" />
-                Adicionar conjunto
-              </Button>
-            )}
-          </div>
-
-          <div className="space-y-6 max-h-96 overflow-y-auto pr-2">
-            {numberSets.map((numbers, setIndex) => (
-              <motion.div
-                key={setIndex}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="border border-gray-200 rounded-lg p-4 space-y-3 bg-white"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-semibold text-gray-600">
-                    Conjunto {setIndex + 1}
-                  </span>
-                  {numberSets.length > 1 && (
-                    <Button
-                      type="button"
-                      onClick={() => removeNumberSet(setIndex)}
-                      size="sm"
-                      variant="ghost"
-                      className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 cursor-pointer"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-3 gap-2">
-                  {numbers.map((num, numIndex) => (
-                    <div key={numIndex} className="space-y-1">
-                      <Input
-                        type="text"
-                        inputMode="numeric"
-                        value={num}
-                        onChange={(e) => handleNumberChange(setIndex, numIndex, e.target.value)}
-                        placeholder={`Nº ${numIndex + 1}`}
-                        maxLength={2}
-                        className={`h-12 text-center text-lg placeholder:text-xs font-bold ${
-                          errors[`set${setIndex}_number${numIndex}`] ? "border-red-400" : ""
-                        }`}
-                      />
-                      {errors[`set${setIndex}_number${numIndex}`] && (
-                        <p className="text-xs text-red-500 text-center">
-                          {errors[`set${setIndex}_number${numIndex}`]}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-
-                {errors[`set${setIndex}_duplicate`] && (
-                  <p className="text-sm text-red-500 text-center">
-                    {errors[`set${setIndex}_duplicate`]}
-                  </p>
+        {/* Number Inputs */}
+        <div className="space-y-3">
+          <Label className="text-sm font-semibold text-gray-700">Números sorteados (1-60)</Label>
+          <div className="grid grid-cols-3 gap-3">
+            {numbers.map((num, index) => (
+              <div key={index} className="space-y-1">
+                <Input
+                  id={`number${index}`}
+                  type="text"
+                  inputMode="numeric"
+                  value={num}
+                  onChange={(e) => handleNumberChange(index, e.target.value)}
+                  placeholder={`Número ${index + 1}`}
+                  maxLength={2}
+                  className={`h-14 text-center text-xl placeholder:text-sm font-bold ${
+                    errors[`number${index}`] ? "border-red-400" : ""
+                  }`}
+                />
+                {errors[`number${index}`] && (
+                  <p className="text-xs text-red-500 text-center">{errors[`number${index}`]}</p>
                 )}
-              </motion.div>
+              </div>
             ))}
           </div>
+          {errors.duplicate && (
+            <p className="text-sm text-red-500 text-center">{errors.duplicate}</p>
+          )}
         </div>
 
         {/* Action Buttons */}

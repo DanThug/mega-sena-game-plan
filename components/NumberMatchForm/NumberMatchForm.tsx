@@ -16,6 +16,7 @@ export default function NumberMatchForm({ onMatch, currentDrawn }: { onMatch: (m
   const [gameId, setGameId] = useState("");
   const [drawnNumbers, setDrawnNumbers] = useState<string[]>(Array(6).fill(""));
   const [errors, setErrors] = useState<FormErrors>({});
+  const [isLoadingGame, setIsLoadingGame] = useState(false);
 
   const handleNumberChange = (index: number, value: string) => {
     const num = value.replace(/\D/g, "");
@@ -24,6 +25,65 @@ export default function NumberMatchForm({ onMatch, currentDrawn }: { onMatch: (m
       newNumbers[index] = num;
       setDrawnNumbers(newNumbers);
       setErrors({ ...errors, [`number${index}` as string]: undefined });
+    }
+  };
+
+  const handleFetchGameData = async () => {
+    const gameIdValue = gameId.trim();
+    
+    // Validar se o gameId foi preenchido
+    if (!gameIdValue) {
+      return;
+    }
+
+    setIsLoadingGame(true);
+
+    try {
+      const response = await fetch(
+        `https://servicebus2.caixa.gov.br/portaldeloterias/api/megasena/${gameIdValue}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`Erro HTTP: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      // Verificar se há uma mensagem de exceção
+      if (data.exceptionMessage) {
+        toast.error("Erro ao obter jogo", {
+          description: data.exceptionMessage,
+        });
+        return;
+      }
+
+      // Verificar se o array listaDezenas existe
+      if (data.listaDezenas && Array.isArray(data.listaDezenas)) {
+        // Preencher os inputs com os números sorteados
+        const numbers = data.listaDezenas.slice(0, 6).map((num: string) => String(num));
+        
+        // Preencher com strings vazias se houver menos de 6 números
+        while (numbers.length < 6) {
+          numbers.push("");
+        }
+        
+        setDrawnNumbers(numbers);
+        
+        toast.success("Números carregados!", {
+          description: `Jogo ${gameIdValue} carregado com sucesso.`,
+        });
+      } else {
+        toast.error("Erro ao obter jogo", {
+          description: "Formato de resposta inválido.",
+        });
+      }
+    } catch (error) {
+      console.error('Erro ao buscar dados do jogo:', error);
+      toast.error("Erro ao obter jogo", {
+        description: "Não foi possível buscar os dados do jogo. Verifique o número e tente novamente.",
+      });
+    } finally {
+      setIsLoadingGame(false);
     }
   };
 
@@ -132,23 +192,17 @@ export default function NumberMatchForm({ onMatch, currentDrawn }: { onMatch: (m
       
       // Calcular combinações para cada jogador
       const playersWithMatches = currentPlayers.map((player: any) => {
-        const playerNumberSets = player.numberSets || [player.numbers];
         const allMatchedNumbers = new Set<number>();
-        
         currentGames.forEach((game: any) => {
-          playerNumberSets.forEach((numberSet: number[]) => {
-            numberSet.forEach((num: number) => {
-              if (game.numbers.includes(num)) {
-                allMatchedNumbers.add(num);
-              }
-            });
+          player.numbers.forEach((num: number) => {
+            if (game.numbers.includes(num)) {
+              allMatchedNumbers.add(num);
+            }
           });
         });
-        
         return {
           name: player.name,
-          numberSets: playerNumberSets,
-          totalSets: playerNumberSets.length,
+          numbers: player.numbers,
           matches: allMatchedNumbers.size
         };
       });
@@ -169,11 +223,9 @@ export default function NumberMatchForm({ onMatch, currentDrawn }: { onMatch: (m
       
       // Seção de Jogadores
       csvContent += "JOGADORES CADASTRADOS\n";
-      csvContent += "Nome,Conjunto,Número 1,Número 2,Número 3,Número 4,Número 5,Número 6,Total Conjuntos,Combinações\n";
+      csvContent += "Nome,Número 1,Número 2,Número 3,Número 4,Número 5,Número 6,Combinações\n";
       playersWithMatches.forEach((player: any) => {
-        player.numberSets.forEach((numberSet: number[], index: number) => {
-          csvContent += `${player.name},${index + 1},${numberSet.join(",")},${player.totalSets},${player.matches}\n`;
-        });
+        csvContent += `${player.name},${player.numbers.join(",")},${player.matches}\n`;
       });
       
       // Download do arquivo
@@ -219,12 +271,19 @@ export default function NumberMatchForm({ onMatch, currentDrawn }: { onMatch: (m
               setGameId(e.target.value);
               setErrors({ ...errors, gameId: undefined });
             }}
+            onBlur={handleFetchGameData}
             placeholder="Digite o número do jogo"
+            disabled={isLoadingGame}
             className={`h-12 text-lg bg-white/10 border-white/20 placeholder:text-sm text-white placeholder:text-blue-200 ${
               errors.gameId ? "border-red-400" : ""
-            }`}
+            } ${isLoadingGame ? "opacity-50 cursor-wait" : ""}`}
           />
           {errors.gameId && <p className="text-xs text-red-300">{errors.gameId}</p>}
+          {isLoadingGame && (
+            <p className="text-xs text-blue-200 animate-pulse">
+              Carregando dados do jogo...
+            </p>
+          )}
         </div>
 
         {/* Drawn Numbers */}

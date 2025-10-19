@@ -16,13 +16,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Mega Sena Game Plan",
   description: "Acompanhe seus números sorteados e encontre ganhadores",
-  icons: {
-    icon: [
-      { url: '/icon.svg', type: 'image/svg+xml' },
-      { url: '/favicon.ico', sizes: '32x32' }
-    ],
-    apple: '/icon.svg',
-  },
 };
 
 export default function RootLayout({

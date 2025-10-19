@@ -54,15 +54,11 @@ export default function PlayerCard({
     if (games.length === 0) return [];
     
     const allMatchedNumbers = new Set<number>();
-    const playerNumberSets = player.numberSets || [player.numbers];
-    
     games.forEach(game => {
-      playerNumberSets.forEach((numberSet: number[]) => {
-        numberSet.forEach((num: number) => {
-          if (game.numbers.includes(num)) {
-            allMatchedNumbers.add(num);
-          }
-        });
+      player.numbers.forEach((num: number) => {
+        if (game.numbers.includes(num)) {
+          allMatchedNumbers.add(num);
+        }
       });
     });
     
@@ -70,11 +66,8 @@ export default function PlayerCard({
   };
 
   const matchedNumbers = getMatchedNumbers();
-  const playerNumberSets = player.numberSets || [player.numbers];
 
-  const handleDeletePlayer = (id: string) => {
-    onDelete(id);
-  };
+  const handleDeletePlayer = (id: string) => onDelete(id);
 
   return (
     <motion.div
@@ -115,38 +108,24 @@ export default function PlayerCard({
           </div>
 
           {/* Content */}
-          <div className="flex-1 min-w-0 space-y-3">
-            <div className="text-xs sm:text-sm text-gray-500 font-semibold">
-              {playerNumberSets.length} {playerNumberSets.length === 1 ? "Conjunto" : "Conjuntos"}
-            </div>
-            
-            <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
-              {playerNumberSets.map((numberSet: number[], setIndex: number) => (
-                <div key={setIndex} className="border border-gray-200 rounded-lg p-2 bg-gray-50">
-                  <div className="text-xs text-gray-500 mb-1.5 font-medium">
-                    Conjunto {setIndex + 1}
-                  </div>
-                  <div className="grid grid-cols-6 gap-1 sm:gap-2">
-                    {numberSet.map((number: number, numIndex: number) => (
-                      <motion.div
-                        key={numIndex}
-                        className={getNumberStyle(number)}
-                        whileHover={{ scale: 1.05 }}
-                        transition={{ type: "spring", stiffness: 400 }}
-                      >
-                        {number}
-                      </motion.div>
-                    ))}
-                  </div>
-                </div>
+          <div className="flex-1 min-w-0">
+            <div className="grid grid-cols-6 gap-2 sm:gap-3 md:gap-4 lg:gap-5">
+              {player.numbers.map((number: number, index: number) => (
+                <motion.div
+                  key={index}
+                  className={getNumberStyle(number)}
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: "spring", stiffness: 400 }}
+                >
+                  {number}
+                </motion.div>
               ))}
             </div>
-
             {matchedNumbers.length > 0 && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="px-2 sm:px-3 py-1 sm:py-1.5 bg-red-50 rounded-lg inline-block"
+                className="mt-4 sm:mt-3 md:mt-4 lg:mt-5 px-2 sm:px-3 py-1 sm:py-1.5 bg-red-50 rounded-lg inline-block"
               >
                 <div className="flex items-center gap-1.5 sm:gap-2">
                   {matchedNumbers.length === 15 && <Crown className={`w-4 h-4 sm:w-5 sm:h-5 text-yellow-600`} />}
